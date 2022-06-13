@@ -1,4 +1,4 @@
-package main
+package lunobot
 
 import "fmt"
 
@@ -15,8 +15,9 @@ const (
 )
 
 var (
-	supportedCommands = map[Command]bool{
-		CommandStatistics: true,
+	supportedCommands = map[Command]Service{
+		CommandStatistics: statsHandler,
+		CommandTrade:      tradingHandler,
 	}
 )
 

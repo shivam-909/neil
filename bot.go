@@ -1,10 +1,12 @@
-package main
+package lunobot
 
 import (
+	"context"
 	"flag"
 	"io/ioutil"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/shivam-909/lunobot/ex/luno"
 	"gopkg.in/yaml.v2"
 )
 
@@ -13,7 +15,8 @@ var (
 )
 
 type config struct {
-	AccessToken string
+	DiscordAccessToken string
+	Luno               luno.Config
 }
 
 type bot struct {
@@ -23,16 +26,17 @@ type bot struct {
 }
 
 func NewBot() *bot {
-	session, err := discordgo.New("")
+
+	bot := &bot{}
+
+	bot.LoadConfig()
+
+	session, err := discordgo.New(bot.Config.DiscordAccessToken)
 	if err != nil {
 		panic(err)
 	}
 
-	bot := &bot{
-		Session: session,
-	}
-
-	bot.LoadConfig()
+	bot.Session = session
 
 	user, err := bot.Session.User("@me")
 	if err != nil {
@@ -40,6 +44,8 @@ func NewBot() *bot {
 	}
 
 	bot.Id = user.ID
+
+	luno.Init(&bot.Config.Luno)
 
 	return bot
 }
@@ -67,12 +73,18 @@ func (b *bot) LoadConfig() {
 	b.Config = c
 }
 func (b *bot) MessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	ctx := context.Background()
+
 	if m.Author.ID == b.Id {
 		return
 	}
+
 	msg := parseMessage(m)
-	switch msg.Command {
-	default:
+	if msg == nil {
 		return
 	}
+
+	svc := supportedCommands[msg.Command]
+	_ = svc(ctx, b, msg)
 }

@@ -1,4 +1,4 @@
-package main
+package lunobot
 
 import (
 	"reflect"
@@ -13,8 +13,8 @@ func TestParseMessages(t *testing.T) {
 		expected *Message
 	}{
 		{
-			input:    "$stats eth mktcap",
-			expected: &Message{Command: CommandStatistics, Trailing: []string{"eth", "mktcap"}},
+			input:    "$stats mktcap eth",
+			expected: &Message{Command: CommandStatistics, Trailing: []string{"mktcap", "eth"}},
 		},
 	}
 

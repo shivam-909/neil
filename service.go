@@ -1,5 +1,7 @@
-package main
+package lunobot
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"context"
+)
 
-type Service func(s *discordgo.Session, m *Message)
+type Service func(ctx context.Context, s *bot, m *Message) error
